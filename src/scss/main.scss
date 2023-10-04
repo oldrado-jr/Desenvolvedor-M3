@@ -31,7 +31,7 @@ header {
       left: 50%;
       background: $primaria;
       color: #ffffff;
-      border-radius: 50%;
+      border-radius: 16px;
       font-size: 10px;
       width: 12px;
       text-align: center;
@@ -202,4 +202,73 @@ footer {
   font-size: 14px;
   text-align: center;
   padding: 7px 0;
+}
+
+@media (max-width: 700px) {
+  header {
+    padding: 0 25px;
+  }
+
+  main {
+    margin: 0;
+    width: 100%;
+
+    #category-info {
+      flex-direction: column;
+      justify-content: center;
+      gap: 12px;
+      margin: 24px 16px 35px;
+
+      #button-container {
+        display: flex;
+        width: 100%;
+
+        button {
+          width: 100%;
+          font-size: 24px;
+          border: 1px solid $cinza2;
+          background: #ffffff;
+          color: $cinza2;
+          padding: 7px 0;
+
+          &:first-child {
+            border-right: none;
+          }
+        }
+      }
+
+      select {
+        display: none;
+      }
+    }
+
+    #container {
+      gap: 0;
+
+      #filter {
+        display: none;
+      }
+
+      #products-list {
+        ul {
+          gap: 18px 16px;
+          margin-bottom: 0;
+
+          li {
+            img {
+              width: 162px;
+            }
+
+            button {
+              max-width: 162px;
+            }
+          }
+        }
+
+        #load-products {
+          margin: 44px 0;
+        }
+      }
+    }
+  }
 }
