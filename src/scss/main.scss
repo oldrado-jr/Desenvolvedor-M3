@@ -14,16 +14,13 @@ button {
   border: none;
 }
 
-header, main {
-  padding: 0 162px;
-}
-
 header {
   border-bottom: 2px solid #C7C7C7;
   height: 62px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 0 162px;
 
   div {
     position: relative;
@@ -43,6 +40,8 @@ header {
 }
 
 main {
+  margin: 0 162px;
+
   #category-info {
     display: flex;
     align-items: center;
