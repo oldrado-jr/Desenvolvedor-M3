@@ -35,7 +35,7 @@ async function renderProducts(page = 1, perPage = 9) {
 }
 
 async function handleLoadProducts(page = 1, perPage = 9) {
-  await renderProducts(++page, perPage);
+  await renderProducts(page, perPage);
 }
 
 function handleFilterButtons(container?: Element) {
@@ -159,7 +159,7 @@ async function main() {
   await renderProducts(page, perPage);
 
   document.querySelector('#load-products').addEventListener('click', async () => {
-    await handleLoadProducts(page, perPage);
+    await handleLoadProducts(++page, perPage);
   });
 
   initializeFilters();
