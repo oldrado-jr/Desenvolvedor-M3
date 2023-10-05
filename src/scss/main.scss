@@ -172,6 +172,10 @@ main {
         align-items: center;
         justify-content: center;
       }
+
+      .selected-size {
+        border-color: $primaria;
+      }
     }
   }
 }

@@ -82,12 +82,16 @@ function handleToggleFilter(element: Element) {
   };
 }
 
+function handleSelectedSize(size: Element) {
+  size.classList.toggle('selected-size');
+}
+
 function hideFiltersOnInit() {
   document.querySelectorAll('#filter-mobile label, #filter-button-container button').forEach((element) => {
     element.setAttribute('hidden', 'hidden');
   });
 
-  (document.querySelector('#filter-mobile ul') as HTMLElement).style.display = 'none';
+  (document.querySelector('#filter-mobile .size-filter ul') as HTMLElement).style.display = 'none';
 }
 
 function initializeMobileFilterButtons() {
@@ -112,6 +116,12 @@ function initializeMobileFilters() {
   document.querySelectorAll('#filter-mobile .filter-text').forEach((element) => {
     element.addEventListener('click', () => {
       handleToggleFilter(element);
+    });
+  });
+
+  document.querySelectorAll('.size-filter ul li').forEach((size) => {
+    size.addEventListener('click', () => {
+      handleSelectedSize(size);
     });
   });
 }
