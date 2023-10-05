@@ -24,8 +24,8 @@
     <div id="category-info">
       <h1>Blusas</h1>
       <div id="button-container" hidden>
-        <button type="button">Filtrar</button>
-        <button type="button">Ordenar</button>
+        <button type="button" id="filtering-button">Filtrar</button>
+        <button type="button" id="ordering-button">Ordenar</button>
       </div>
       <select>
         <option value="">Ordenar por:</option>
@@ -131,7 +131,7 @@
   <div id="ordering-container" class="filter-container-mobile" hidden>
     <div class="filter-title">
       Ordenar
-      <div>
+      <div class="close-icon">
         <img src="./img/close-icon.svg" alt="Ícone de fechar">
       </div>
     </div>
@@ -144,7 +144,7 @@
   <div id="filtering-container" class="filter-container-mobile" hidden>
     <div class="filter-title">
       Filtrar
-      <div>
+      <div class="close-icon">
         <img src="./img/close-icon.svg" alt="Ícone de fechar">
       </div>
     </div>
