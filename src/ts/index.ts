@@ -1,4 +1,4 @@
-import { Product } from "./Product";
+import { Product } from './Product';
 
 async function getProducts(): Promise<Product[]> {
   const serverUrl = 'http://localhost:5000';
@@ -8,9 +8,9 @@ async function getProducts(): Promise<Product[]> {
 
 async function renderProducts(page = 1, perPage = 9) {
   const products = await getProducts();
-  const removedProducts = products.splice((page - 1) * perPage, perPage);
+  const productsToRender = products.splice((page - 1) * perPage, perPage);
 
-  removedProducts.map((product, index) => {
+  productsToRender.map((product, index) => {
     if (index >= perPage) {
       return;
     }
@@ -27,7 +27,9 @@ async function renderProducts(page = 1, perPage = 9) {
     document.querySelector('#products-list ul').innerHTML += productLine;
   });
 
-  if (removedProducts.length === 0 || removedProducts.length < perPage) {
+  const allProductsRendered = productsToRender.length === 0 || productsToRender.length < perPage;
+
+  if (allProductsRendered) {
     document.querySelector('#load-products').remove();
   }
 }
@@ -35,16 +37,16 @@ async function renderProducts(page = 1, perPage = 9) {
 async function main() {
   let page = 1;
   let perPage = 9;
+  const baseWidth = 700;
 
-  if (document.body.offsetWidth <= 700) {
+  if (document.body.offsetWidth <= baseWidth) {
     perPage = Math.trunc(Math.floor(perPage / 2));
   }
 
   await renderProducts(page, perPage);
 
   document.querySelector('#load-products').addEventListener('click', async () => {
-    page++;
-    await renderProducts(page, perPage);
+    await renderProducts(++page, perPage);
   });
 }
 
