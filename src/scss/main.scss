@@ -182,6 +182,16 @@ main {
 
 #filter {
   width: 100%;
+
+  .color-filter {
+    #show-all-colors {
+      cursor: pointer;
+      font-size: 12px;
+      line-height: 100%;
+      text-decoration: underline;
+      color: $cinza2;
+    }
+  }
 }
 
 #filter label, #filter-mobile #colors-mobile label {

@@ -118,6 +118,27 @@ function initializeMobileFilters() {
       handleToggleFilter(element);
     });
   });
+}
+
+function initializeDesktopFilters() {
+  document.querySelectorAll('#filter .color-filter label:nth-last-child(-n+6)').forEach((label) => {
+    (label as HTMLElement).style.display = 'none';
+  });
+
+  const showAllColorsElement = document.querySelector('#show-all-colors');
+
+  showAllColorsElement.addEventListener('click', () => {
+    document.querySelectorAll('#filter .color-filter label[style*="display: none"').forEach((label) => {
+      (label as HTMLElement).style.display = 'flex';
+    });
+
+    showAllColorsElement.setAttribute('hidden', 'hidden');
+  });
+}
+
+function initializeFilters() {
+  initializeMobileFilters();
+  initializeDesktopFilters();
 
   document.querySelectorAll('.size-filter ul li').forEach((size) => {
     size.addEventListener('click', () => {
@@ -141,7 +162,7 @@ async function main() {
     await handleLoadProducts(page, perPage);
   });
 
-  initializeMobileFilters();
+  initializeFilters();
 }
 
 document.addEventListener("DOMContentLoaded", main);
