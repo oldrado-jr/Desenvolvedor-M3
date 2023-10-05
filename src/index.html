@@ -36,7 +36,7 @@
     </div>
     <div id="container">
       <div id="filter">
-        <div id="color-filter">
+        <div class="color-filter">
           <span class="filter-text">Cores</span>
           <label for="yellow-checkbox">
             <input type="checkbox" id="yellow-checkbox" value="">
@@ -79,7 +79,7 @@
             Vinho
           </label>
         </div>
-        <div id="size-filter">
+        <div class="size-filter">
           <span class="filter-text">Tamanhos</span>
           <ul>
             <li class="filter-text">P</li>
@@ -95,7 +95,7 @@
             <li class="filter-text">46</li>
           </ul>
         </div>
-        <div id="price-filter">
+        <div class="price-filter">
           <span class="filter-text">Faixa de Preço</span>
           <label for="price-interval-checkbox-1">
             <input type="checkbox" id="price-interval-checkbox-1" value="">
@@ -213,13 +213,126 @@
   <div id="ordering-container" class="filter-container-mobile" hidden>
     <div class="filter-title">
       Ordenar
-      <div>&times;</div>
+      <div>
+        <img src="./img/close-icon.svg" alt="Ícone de fechar">
+      </div>
     </div>
-    <ul>
+    <ul id="ordering-list">
       <li>Mais recentes</li>
       <li>Menor preço</li>
       <li>Maior preço</li>
     </ul>
+  </div>
+  <div id="filtering-container" class="filter-container-mobile" hidden>
+    <div class="filter-title">
+      Filtrar
+      <div>
+        <img src="./img/close-icon.svg" alt="Ícone de fechar">
+      </div>
+    </div>
+    <div id="filter-mobile">
+      <div class="color-filter">
+        <span class="filter-text">
+          Cores
+          <div>
+            <img src="./img/vector.svg" alt="Seta">
+          </div>
+        </span>
+        <label for="yellow-checkbox-mobile">
+          <input type="checkbox" id="yellow-checkbox-mobile" value="">
+          Amarelo
+        </label>
+        <label for="blue-checkbox-mobile">
+          <input type="checkbox" id="blue-checkbox-mobile" value="">
+          Azul
+        </label>
+        <label for="white-checkbox-mobile">
+          <input type="checkbox" id="white-checkbox-mobile" value="">
+          Branco
+        </label>
+        <label for="gray-checkbox-mobile">
+          <input type="checkbox" id="gray-checkbox-mobile" value="">
+          Cinza
+        </label>
+        <label for="orange-checkbox-mobile">
+          <input type="checkbox" id="orange-checkbox-mobile" value="">
+          Laranja
+        </label>
+        <label for="green-checkbox-mobile">
+          <input type="checkbox" id="green-checkbox-mobile" value="">
+          Verde
+        </label>
+        <label for="red-checkbox-mobile">
+          <input type="checkbox" id="red-checkbox-mobile" value="">
+          Vermelho
+        </label>
+        <label for="black-checkbox-mobile">
+          <input type="checkbox" id="black-checkbox-mobile" value="">
+          Preto
+        </label>
+        <label for="pink-checkbox-mobile">
+          <input type="checkbox" id="pink-checkbox-mobile" value="">
+          Rosa
+        </label>
+        <label for="wine-checkbox-mobile">
+          <input type="checkbox" id="wine-checkbox-mobile" value="">
+          Vinho
+        </label>
+      </div>
+      <div class="size-filter">
+        <span class="filter-text">
+          Tamanhos
+          <div>
+            <img src="./img/vector.svg" alt="Seta">
+          </div>
+        </span>
+        <ul>
+          <li class="filter-text">P</li>
+          <li class="filter-text">M</l>
+          <li class="filter-text">G</li>
+          <li class="filter-text">GG</li>
+          <li class="filter-text">U</li>
+          <li class="filter-text">36</li>
+          <li class="filter-text">38</li>
+          <li class="filter-text">40</li>
+          <li class="filter-text">42</li>
+          <li class="filter-text">44</li>
+          <li class="filter-text">46</li>
+        </ul>
+      </div>
+      <div class="price-filter">
+        <span class="filter-text">
+          Faixa de Preço
+          <div>
+            <img src="./img/vector.svg" alt="Seta">
+          </div>
+        </span>
+        <label for="price-interval-checkbox-mobile-1">
+          <input type="checkbox" id="price-interval-checkbox-mobile-1" value="">
+          de R$0 até R$50
+        </label>
+        <label for="price-interval-checkbox-mobile-2">
+          <input type="checkbox" id="price-interval-checkbox-mobile-2" value="">
+          de R$51 até R$150
+        </label>
+        <label for="price-interval-checkbox-mobile-3">
+          <input type="checkbox" id="price-interval-checkbox-mobile-3" value="">
+          de R$151 até R$300
+        </label>
+        <label for="price-interval-checkbox-mobile-4">
+          <input type="checkbox" id="price-interval-checkbox-mobile-4" value="">
+          de R$301 até R$500
+        </label>
+        <label for="price-interval-checkbox-mobile-5">
+          <input type="checkbox" id="price-interval-checkbox-mobile-5" value="">
+          a partir de R$500
+        </label>
+      </div>
+      <div id="filter-button-container">
+        <button type="button">Aplicar</button>
+        <button type="button">Limpar</button>
+      </div>
+    </div>
   </div>
   <script src="bundle.js"></script>
 </body>
