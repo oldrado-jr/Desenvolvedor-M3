@@ -1,3 +1,5 @@
+import { Cart } from './Cart';
+import { CartItem } from './CartItem';
 import { Product } from './Product';
 
 async function getProducts(): Promise<Product[]> {
@@ -22,7 +24,11 @@ async function renderProducts(page = 1, perPage = 9) {
         <span class="product-price">R$${product.price.toFixed(2).replace('.', ',')}</span>
         <span class="product-installment">até ${product.parcelamento[0]}x de R$${product.parcelamento[1].toFixed(2).replace('.', ',')}</span>
       </div>
-      <button type="button">Comprar</button>
+      <button type="button" class="add-to-cart">
+        <input type="hidden" class="product-id" value="${product.id}">
+        <input type="hidden" class="product-price" value="${product.price}">
+        Comprar
+      </button>
     </li>`;
     document.querySelector('#products-list ul').innerHTML += productLine;
   });
@@ -32,6 +38,12 @@ async function renderProducts(page = 1, perPage = 9) {
   if (allProductsRendered) {
     document.querySelector('#load-products').remove();
   }
+
+  document.querySelectorAll('.add-to-cart').forEach((button) => {
+    button.addEventListener('click', () => {
+      handleAddToCart(button);
+    });
+  });
 }
 
 async function handleLoadProducts(page = 1, perPage = 9) {
@@ -147,6 +159,55 @@ function initializeFilters() {
   });
 }
 
+function updateCartItemCount(cart: Cart) {
+  const totalItemsInCart = getTotalItemsFromCart(cart);
+  document.querySelector('#shopping-cart-item-count').textContent = totalItemsInCart.toString();
+}
+
+function getTotalItemsFromCart(cart: Cart) {
+  return cart.items
+    .map((item) => item.quantity)
+    .reduce(
+      (previousQuantity, currentQuantity) => previousQuantity + currentQuantity, 0
+    );
+}
+
+function getCart(): Cart {
+  return JSON.parse(localStorage.getItem('cart')) || {
+    items: [],
+  };
+}
+
+function addToCart({ productId, price, quantity }: CartItem) {
+  const cart = getCart();
+  const cartItems = [...cart.items];
+  const itemInCart = cartItems.find((item) => item.productId === productId);
+
+  if (itemInCart) {
+    cartItems.find((item) => item.productId === productId).quantity++;
+  } else {
+    const itemToAddInCart = {
+      productId,
+      quantity,
+      price,
+    };
+    cartItems.push(itemToAddInCart);
+  }
+
+  cart.items = cartItems;
+  localStorage.setItem('cart', JSON.stringify(cart));
+
+  updateCartItemCount(cart);
+}
+
+function handleAddToCart(button: Element) {
+  const productIdInput: HTMLInputElement = button.querySelector('.product-id');
+  const productPriceInput: HTMLInputElement = button.querySelector('.product-price');
+  const productId = productIdInput.value;
+  const productPrice = parseFloat(productPriceInput.value);
+  addToCart({ productId, price: productPrice, quantity: 1 });
+}
+
 async function main() {
   let page = 1;
   let perPage = 9;
@@ -163,6 +224,8 @@ async function main() {
   });
 
   initializeFilters();
+
+  updateCartItemCount(getCart());
 }
 
 document.addEventListener("DOMContentLoaded", main);
