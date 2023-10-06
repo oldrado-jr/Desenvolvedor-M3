@@ -90,7 +90,13 @@ async function renderProducts(
 }
 
 async function handleLoadProducts(page: number, perPage: number) {
-  const { selectedColors, selectedSizes, selectedPriceIntervals } = getDesktopFilters();
+  let deviceType = 'desktop';
+
+  if (isMobile()) {
+    deviceType = 'mobile';
+  }
+
+  const { selectedColors, selectedSizes, selectedPriceIntervals } = getFilters(deviceType);
   await renderProducts(page, perPage, selectedColors, selectedSizes, selectedPriceIntervals);
 }
 
@@ -142,8 +148,29 @@ function handleSelectedSize(size: Element) {
   size.classList.toggle('selected-size');
 }
 
+function hasSelectedFilter(
+  selectedColors: string[],
+  selectedSizes: string[],
+  selectedPriceIntervals: string[][]
+) {
+  return selectedColors.length > 0
+    || selectedSizes.length > 0
+    || selectedPriceIntervals.length > 0;
+}
+
 async function handleFilter(perPage: number) {
   const { selectedColors, selectedSizes, selectedPriceIntervals } = getDesktopFilters();
+  document.querySelector('#products-list ul').innerHTML = '';
+  await renderProducts(1, perPage, selectedColors, selectedSizes, selectedPriceIntervals);
+}
+
+async function handleMobileFilter(perPage: number) {
+  const { selectedColors, selectedSizes, selectedPriceIntervals } = getMobileFilters();
+
+  if (!hasSelectedFilter(selectedColors, selectedSizes, selectedPriceIntervals)) {
+    return;
+  }
+
   document.querySelector('#products-list ul').innerHTML = '';
   await renderProducts(1, perPage, selectedColors, selectedSizes, selectedPriceIntervals);
 }
@@ -163,14 +190,24 @@ function handleClearMobileFilters() {
 }
 
 function getDesktopFilters() {
+  const deviceType = 'desktop';
+  return getFilters(deviceType);
+}
+
+function getMobileFilters() {
+  const deviceType = 'mobile';
+  return getFilters(deviceType);
+}
+
+function getFilters(deviceType: string) {
   const selectedColors = Array.from(
-    document.querySelectorAll('.color-checkbox-desktop:checked')
+    document.querySelectorAll(`.color-checkbox-${deviceType}:checked`)
   ).map((selectedCheckbox) => (selectedCheckbox as HTMLInputElement).value);
   const selectedPriceIntervals = Array.from(
-    document.querySelectorAll('.price-interval-checkbox-desktop:checked')
+    document.querySelectorAll(`.price-interval-checkbox-${deviceType}:checked`)
   ).map((selectedCheckbox) => (selectedCheckbox as HTMLInputElement).value.split(','));
   const selectedSizes = Array.from(
-    document.querySelectorAll('.size-filter li.filter-type-desktop.selected-size')
+    document.querySelectorAll(`.size-filter li.filter-type-${deviceType}.selected-size`)
   ).map((selectedSizeLi) => selectedSizeLi.textContent.trim());
 
   return { selectedColors, selectedSizes, selectedPriceIntervals };
@@ -280,12 +317,16 @@ function handleAddToCart(button: Element) {
   addToCart({ productId, price: productPrice, quantity: 1 });
 }
 
+function isMobile() {
+  const baseWidth = 700;
+  return document.body.offsetWidth <= baseWidth;
+}
+
 async function main() {
   let page = 1;
   let perPage = 9;
-  const baseWidth = 700;
 
-  if (document.body.offsetWidth <= baseWidth) {
+  if (isMobile()) {
     perPage = Math.trunc(Math.floor(perPage / 2));
   }
 
@@ -314,6 +355,11 @@ async function main() {
         await handleFilter(perPage);
       }
     });
+  });
+
+  document.querySelector('#apply-mobile-filter').addEventListener('click', async () => {
+    page = 1;
+    await handleMobileFilter(perPage);
   });
 
   document.querySelector('#clear-mobile-filter').addEventListener('click', async () => {
