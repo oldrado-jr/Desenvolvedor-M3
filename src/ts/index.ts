@@ -12,17 +12,26 @@ function filterProducts(
   products: Product[],
   colors: string[],
   sizes: string[],
-  priceIntervals: string[]
+  priceIntervals: string[][]
 ) {
   const needToFilter = colors.length > 0
-    || sizes.length > 0;
+    || sizes.length > 0
+    || priceIntervals.length > 0;
 
   if (needToFilter) {
     return products.filter(
       (product) => {
         const productHasSelectedColor = colors.length === 0 || colors.includes(product.color);
         const productHasSelectedSize = sizes.length === 0 || product.size.filter((size) => sizes.includes(size)).length > 0;
-        return productHasSelectedColor && productHasSelectedSize;
+        const productPriceIsBetweenInterval = priceIntervals.length === 0
+          || priceIntervals.filter(
+            (priceInterval) => product.price >= parseInt(priceInterval[0])
+              && (
+                priceInterval[1].length === 0
+                || product.price <= parseInt(priceInterval[1])
+              )
+          ).length > 0;
+        return productHasSelectedColor && productHasSelectedSize && productPriceIsBetweenInterval;
       }
     );
   }
@@ -35,7 +44,7 @@ async function renderProducts(
   perPage = 9,
   colors: string[] = [],
   sizes: string[] = [],
-  priceIntervals: string[] = []
+  priceIntervals: string[][] = []
 ) {
   const products = await getProducts();
   const filteredProducts = filterProducts(products, colors, sizes, priceIntervals);
@@ -62,7 +71,9 @@ async function renderProducts(
     document.querySelector('#products-list ul').innerHTML += productLine;
   });
 
-  const allProductsRendered = productsToRender.length === 0 || productsToRender.length < perPage;
+  const allProductsRendered = productsToRender.length === 0
+    || productsToRender.length < perPage
+    || filteredProducts.length === 0;
   const loadProductsButton = document.querySelector('#load-products');
 
   if (allProductsRendered) {
@@ -78,8 +89,9 @@ async function renderProducts(
   });
 }
 
-async function handleLoadProducts(page = 1, perPage = 9) {
-  await renderProducts(page, perPage);
+async function handleLoadProducts(page: number, perPage: number) {
+  const { selectedColors, selectedSizes, selectedPriceIntervals } = getDesktopFilters();
+  await renderProducts(page, perPage, selectedColors, selectedSizes, selectedPriceIntervals);
 }
 
 function handleFilterButtons(container?: Element) {
@@ -131,18 +143,23 @@ function handleSelectedSize(size: Element) {
 }
 
 async function handleFilter(perPage: number) {
+  const { selectedColors, selectedSizes, selectedPriceIntervals } = getDesktopFilters();
+  document.querySelector('#products-list ul').innerHTML = '';
+  await renderProducts(1, perPage, selectedColors, selectedSizes, selectedPriceIntervals);
+}
+
+function getDesktopFilters() {
   const selectedColors = Array.from(
     document.querySelectorAll('.color-checkbox-desktop:checked')
   ).map((selectedCheckbox) => (selectedCheckbox as HTMLInputElement).value);
-  const selectedPrices = Array.from(
+  const selectedPriceIntervals = Array.from(
     document.querySelectorAll('.price-interval-checkbox-desktop:checked')
-  ).map((selectedCheckbox) => (selectedCheckbox as HTMLInputElement).value);
+  ).map((selectedCheckbox) => (selectedCheckbox as HTMLInputElement).value.split(','));
   const selectedSizes = Array.from(
     document.querySelectorAll('.size-filter li.filter-type-desktop.selected-size')
   ).map((selectedSizeLi) => selectedSizeLi.textContent.trim());
 
-  document.querySelector('#products-list ul').innerHTML = '';
-  await renderProducts(1, perPage, selectedColors, selectedSizes, selectedPrices);
+  return { selectedColors, selectedSizes, selectedPriceIntervals };
 }
 
 function hideFiltersOnInit() {
@@ -265,7 +282,6 @@ async function main() {
   });
 
   initializeFilters();
-
   updateCartItemCount(getCart());
 
   document.querySelectorAll('#filter .color-filter input[type="checkbox"], #filter .price-filter input[type="checkbox"]').forEach((checkbox) => {
