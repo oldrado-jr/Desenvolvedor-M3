@@ -148,6 +148,20 @@ async function handleFilter(perPage: number) {
   await renderProducts(1, perPage, selectedColors, selectedSizes, selectedPriceIntervals);
 }
 
+function handleClearMobileFilters() {
+  document
+    .querySelectorAll(
+    '.color-checkbox-mobile:checked, .price-interval-checkbox-mobile:checked'
+    ).forEach((checkbox) => {
+      (checkbox as HTMLInputElement).checked = false;
+    });
+  document
+    .querySelectorAll('.size-filter li.filter-type-mobile.selected-size')
+    .forEach((sizeLi) => {
+      sizeLi.classList.remove('selected-size');
+    });
+}
+
 function getDesktopFilters() {
   const selectedColors = Array.from(
     document.querySelectorAll('.color-checkbox-desktop:checked')
@@ -300,6 +314,13 @@ async function main() {
         await handleFilter(perPage);
       }
     });
+  });
+
+  document.querySelector('#clear-mobile-filter').addEventListener('click', async () => {
+    page = 1;
+    handleClearMobileFilters();
+    document.querySelector('#products-list ul').innerHTML = '';
+    await renderProducts(page, perPage);
   });
 }
 
