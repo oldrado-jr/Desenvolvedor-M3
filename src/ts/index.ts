@@ -222,33 +222,29 @@ async function handleMobileFilter(perPage: number) {
   await renderProducts(1, perPage, selectedColors, selectedSizes, selectedPriceIntervals, orderingCallback);
 }
 
-function handleClearDesktopFilters() {
+function clearCommonFilters(deviceType: string) {
   document
     .querySelectorAll(
-    '.color-checkbox-desktop:checked, .price-interval-checkbox-desktop:checked'
+      `.color-checkbox-${deviceType}:checked, .price-interval-checkbox-${deviceType}:checked`
     ).forEach((checkbox) => {
       (checkbox as HTMLInputElement).checked = false;
     });
   document
-    .querySelectorAll('.size-filter li.filter-type-desktop.selected-size')
+    .querySelectorAll(`.size-filter li.filter-type-${deviceType}.selected-size`)
     .forEach((sizeLi) => {
       sizeLi.classList.remove('selected-size');
     });
+}
+
+function handleClearDesktopFilters() {
+  const deviceType = 'desktop';
+  clearCommonFilters(deviceType);
   document.querySelector('#product-ordering-desktop option:first-child').setAttribute('selected', 'selected');
 }
 
 function handleClearMobileFilters() {
-  document
-    .querySelectorAll(
-    '.color-checkbox-mobile:checked, .price-interval-checkbox-mobile:checked'
-    ).forEach((checkbox) => {
-      (checkbox as HTMLInputElement).checked = false;
-    });
-  document
-    .querySelectorAll('.size-filter li.filter-type-mobile.selected-size')
-    .forEach((sizeLi) => {
-      sizeLi.classList.remove('selected-size');
-    });
+  const deviceType = 'mobile';
+  clearCommonFilters(deviceType);
   document
     .querySelectorAll('#ordering-list li.active-ordering')
     .forEach((activeOrdering) => {
