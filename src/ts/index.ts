@@ -14,13 +14,15 @@ function filterProducts(
   sizes: string[],
   priceIntervals: string[]
 ) {
-  const needToFilter = colors.length > 0;
+  const needToFilter = colors.length > 0
+    || sizes.length > 0;
 
   if (needToFilter) {
     return products.filter(
       (product) => {
-        const productHasSelectedColor = colors.includes(product.color);
-        return productHasSelectedColor;
+        const productHasSelectedColor = colors.length === 0 || colors.includes(product.color);
+        const productHasSelectedSize = sizes.length === 0 || product.size.filter((size) => sizes.includes(size)).length > 0;
+        return productHasSelectedColor && productHasSelectedSize;
       }
     );
   }
@@ -196,12 +198,6 @@ function initializeDesktopFilters() {
 function initializeFilters() {
   initializeMobileFilters();
   initializeDesktopFilters();
-
-  document.querySelectorAll('.size-filter ul li').forEach((size) => {
-    size.addEventListener('click', () => {
-      handleSelectedSize(size);
-    });
-  });
 }
 
 function updateCartItemCount(cart: Cart) {
@@ -276,6 +272,17 @@ async function main() {
     checkbox.addEventListener('change', async () => {
       page = 1;
       await handleFilter(perPage);
+    });
+  });
+
+  document.querySelectorAll('.size-filter ul li').forEach((size) => {
+    size.addEventListener('click', async () => {
+      page = 1;
+      handleSelectedSize(size);
+
+      if (size.classList.contains('filter-type-desktop')) {
+        await handleFilter(perPage);
+      }
     });
   });
 }
