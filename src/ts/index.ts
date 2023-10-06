@@ -8,9 +8,36 @@ async function getProducts(): Promise<Product[]> {
   return await response.json();
 }
 
-async function renderProducts(page = 1, perPage = 9) {
+function filterProducts(
+  products: Product[],
+  colors: string[],
+  sizes: string[],
+  priceIntervals: string[]
+) {
+  const needToFilter = colors.length > 0;
+
+  if (needToFilter) {
+    return products.filter(
+      (product) => {
+        const productHasSelectedColor = colors.includes(product.color);
+        return productHasSelectedColor;
+      }
+    );
+  }
+
+  return products;
+}
+
+async function renderProducts(
+  page = 1,
+  perPage = 9,
+  colors: string[] = [],
+  sizes: string[] = [],
+  priceIntervals: string[] = []
+) {
   const products = await getProducts();
-  const productsToRender = products.splice((page - 1) * perPage, perPage);
+  const filteredProducts = filterProducts(products, colors, sizes, priceIntervals);
+  const productsToRender = filteredProducts.splice((page - 1) * perPage, perPage);
 
   productsToRender.map((product, index) => {
     if (index >= perPage) {
@@ -34,9 +61,12 @@ async function renderProducts(page = 1, perPage = 9) {
   });
 
   const allProductsRendered = productsToRender.length === 0 || productsToRender.length < perPage;
+  const loadProductsButton = document.querySelector('#load-products');
 
   if (allProductsRendered) {
-    document.querySelector('#load-products').remove();
+    loadProductsButton.setAttribute('hidden', 'hidden');
+  } else {
+    loadProductsButton.removeAttribute('hidden');
   }
 
   document.querySelectorAll('.add-to-cart').forEach((button) => {
@@ -96,6 +126,21 @@ function handleToggleFilter(element: Element) {
 
 function handleSelectedSize(size: Element) {
   size.classList.toggle('selected-size');
+}
+
+async function handleFilter(perPage: number) {
+  const selectedColors = Array.from(
+    document.querySelectorAll('.color-checkbox-desktop:checked')
+  ).map((selectedCheckbox) => (selectedCheckbox as HTMLInputElement).value);
+  const selectedPrices = Array.from(
+    document.querySelectorAll('.price-interval-checkbox-desktop:checked')
+  ).map((selectedCheckbox) => (selectedCheckbox as HTMLInputElement).value);
+  const selectedSizes = Array.from(
+    document.querySelectorAll('.size-filter li.filter-type-desktop.selected-size')
+  ).map((selectedSizeLi) => selectedSizeLi.textContent.trim());
+
+  document.querySelector('#products-list ul').innerHTML = '';
+  await renderProducts(1, perPage, selectedColors, selectedSizes, selectedPrices);
 }
 
 function hideFiltersOnInit() {
@@ -226,6 +271,13 @@ async function main() {
   initializeFilters();
 
   updateCartItemCount(getCart());
+
+  document.querySelectorAll('#filter .color-filter input[type="checkbox"], #filter .price-filter input[type="checkbox"]').forEach((checkbox) => {
+    checkbox.addEventListener('change', async () => {
+      page = 1;
+      await handleFilter(perPage);
+    });
+  });
 }
 
 document.addEventListener("DOMContentLoaded", main);
