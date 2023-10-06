@@ -14,11 +14,7 @@ function filterProducts(
   sizes: string[],
   priceIntervals: string[][]
 ) {
-  const needToFilter = colors.length > 0
-    || sizes.length > 0
-    || priceIntervals.length > 0;
-
-  if (needToFilter) {
+  if (hasSelectedFilter(colors, sizes, priceIntervals)) {
     return products.filter(
       (product) => {
         const productHasSelectedColor = colors.length === 0 || colors.includes(product.color);
@@ -224,6 +220,21 @@ async function handleMobileFilter(perPage: number) {
   const orderingCallback = getOrderingCallback(orderingType);
   document.querySelector('#products-list ul').innerHTML = '';
   await renderProducts(1, perPage, selectedColors, selectedSizes, selectedPriceIntervals, orderingCallback);
+}
+
+function handleClearDesktopFilters() {
+  document
+    .querySelectorAll(
+    '.color-checkbox-desktop:checked, .price-interval-checkbox-desktop:checked'
+    ).forEach((checkbox) => {
+      (checkbox as HTMLInputElement).checked = false;
+    });
+  document
+    .querySelectorAll('.size-filter li.filter-type-desktop.selected-size')
+    .forEach((sizeLi) => {
+      sizeLi.classList.remove('selected-size');
+    });
+  document.querySelector('#product-ordering-desktop option:first-child').setAttribute('selected', 'selected');
 }
 
 function handleClearMobileFilters() {
@@ -451,15 +462,44 @@ async function main() {
     });
   });
 
-  window.addEventListener('resize', () => {
+  window.addEventListener('resize', async () => {
     if (isMobile()) {
-      // todo
+      const { selectedColors, selectedSizes, selectedPriceIntervals } = getDesktopFilters();
+      let orderingType = (document.querySelector('#product-ordering-desktop') as HTMLSelectElement).value;
+
+      if (
+        hasSelectedFilter(selectedColors, selectedSizes, selectedPriceIntervals)
+        || orderingType.length > 0
+      ) {
+        page = 1;
+        handleClearDesktopFilters();
+        document.querySelector('#products-list ul').innerHTML = '';
+        await renderProducts(page, perPage);
+      }
     } else {
       const openedFilterContainerMobile = document.querySelector('.filter-container-mobile:not([hidden])');
 
       if (openedFilterContainerMobile) {
         openedFilterContainerMobile.setAttribute('hidden', 'hidden');
         document.body.style.overflow = 'initial';
+      }
+
+      const { selectedColors, selectedSizes, selectedPriceIntervals } = getMobileFilters();
+      const activeOrderingLi = document.querySelector('#ordering-list li.active-ordering');
+      let orderingType = '';
+
+      if (activeOrderingLi) {
+        orderingType = activeOrderingLi.getAttribute('id');
+      }
+
+      if (
+        hasSelectedFilter(selectedColors, selectedSizes, selectedPriceIntervals)
+        || orderingType.length > 0
+      ) {
+        page = 1;
+        handleClearMobileFilters();
+        document.querySelector('#products-list ul').innerHTML = '';
+        await renderProducts(page, perPage);
       }
     }
   });
