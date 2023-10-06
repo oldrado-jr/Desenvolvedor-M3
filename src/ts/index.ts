@@ -450,6 +450,19 @@ async function main() {
       await renderProducts(page, perPage, selectedColors, selectedSizes, selectedPriceIntervals, orderingCallback);
     });
   });
+
+  window.addEventListener('resize', () => {
+    if (isMobile()) {
+      // todo
+    } else {
+      const openedFilterContainerMobile = document.querySelector('.filter-container-mobile:not([hidden])');
+
+      if (openedFilterContainerMobile) {
+        openedFilterContainerMobile.setAttribute('hidden', 'hidden');
+        document.body.style.overflow = 'initial';
+      }
+    }
+  });
 }
 
 document.addEventListener("DOMContentLoaded", main);
