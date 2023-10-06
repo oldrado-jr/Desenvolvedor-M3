@@ -102,6 +102,11 @@ async function handleLoadProducts(page: number, perPage: number) {
   if (isMobile()) {
     deviceType = 'mobile';
     orderingType = '';
+    const activeOrderingLi = document.querySelector('#ordering-list li.active-ordering');
+
+    if (activeOrderingLi) {
+      orderingType = activeOrderingLi.getAttribute('id');
+    }
   }
 
   const orderingCallback = getOrderingCallback(orderingType);
@@ -209,8 +214,16 @@ async function handleMobileFilter(perPage: number) {
     return;
   }
 
+  const activeOrderingLi = document.querySelector('#ordering-list li.active-ordering');
+  let orderingType = '';
+
+  if (activeOrderingLi) {
+    orderingType = activeOrderingLi.getAttribute('id');
+  }
+
+  const orderingCallback = getOrderingCallback(orderingType);
   document.querySelector('#products-list ul').innerHTML = '';
-  await renderProducts(1, perPage, selectedColors, selectedSizes, selectedPriceIntervals);
+  await renderProducts(1, perPage, selectedColors, selectedSizes, selectedPriceIntervals, orderingCallback);
 }
 
 function handleClearMobileFilters() {
@@ -224,6 +237,11 @@ function handleClearMobileFilters() {
     .querySelectorAll('.size-filter li.filter-type-mobile.selected-size')
     .forEach((sizeLi) => {
       sizeLi.classList.remove('selected-size');
+    });
+  document
+    .querySelectorAll('#ordering-list li.active-ordering')
+    .forEach((activeOrdering) => {
+      activeOrdering.classList.remove('active-ordering');
     });
 }
 
@@ -414,6 +432,23 @@ async function main() {
     const { selectedColors, selectedSizes, selectedPriceIntervals } = getDesktopFilters();
     document.querySelector('#products-list ul').innerHTML = '';
     await renderProducts(page, perPage, selectedColors, selectedSizes, selectedPriceIntervals, orderingCallback);
+  });
+
+  document.querySelectorAll('#ordering-list li').forEach((orderingLi) => {
+    orderingLi.addEventListener('click', async () => {
+      page = 1;
+
+      document.querySelectorAll('#ordering-list li.active-ordering').forEach((activeOrdering) => {
+        activeOrdering.classList.remove('active-ordering');
+      });
+
+      orderingLi.classList.add('active-ordering');
+      const orderingType = orderingLi.getAttribute('id');
+      const orderingCallback = getOrderingCallback(orderingType);
+      const { selectedColors, selectedSizes, selectedPriceIntervals } = getMobileFilters();
+      document.querySelector('#products-list ul').innerHTML = '';
+      await renderProducts(page, perPage, selectedColors, selectedSizes, selectedPriceIntervals, orderingCallback);
+    });
   });
 }
 
