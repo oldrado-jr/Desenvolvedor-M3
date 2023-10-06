@@ -36,7 +36,7 @@ function filterProducts(
     );
   }
 
-  return products;
+  return [...products];
 }
 
 async function renderProducts(
@@ -44,10 +44,16 @@ async function renderProducts(
   perPage = 9,
   colors: string[] = [],
   sizes: string[] = [],
-  priceIntervals: string[][] = []
+  priceIntervals: string[][] = [],
+  orderingCallback?: (product1: Product, product2: Product) => number
 ) {
   const products = await getProducts();
   const filteredProducts = filterProducts(products, colors, sizes, priceIntervals);
+
+  if (orderingCallback) {
+    filteredProducts.sort(orderingCallback);
+  }
+
   const productsToRender = filteredProducts.splice((page - 1) * perPage, perPage);
 
   productsToRender.map((product, index) => {
@@ -91,13 +97,43 @@ async function renderProducts(
 
 async function handleLoadProducts(page: number, perPage: number) {
   let deviceType = 'desktop';
+  let orderingType = (document.querySelector('#product-ordering-desktop') as HTMLSelectElement).value;
 
   if (isMobile()) {
     deviceType = 'mobile';
+    orderingType = '';
   }
 
+  const orderingCallback = getOrderingCallback(orderingType);
   const { selectedColors, selectedSizes, selectedPriceIntervals } = getFilters(deviceType);
-  await renderProducts(page, perPage, selectedColors, selectedSizes, selectedPriceIntervals);
+  await renderProducts(page, perPage, selectedColors, selectedSizes, selectedPriceIntervals, orderingCallback);
+}
+
+function getOrderingCallback(orderingType: string) {
+  let orderingCallback;
+
+  switch (orderingType) {
+    case 'mais-recentes':
+      orderingCallback = (product1: Product, product2: Product) => {
+        return -(new Date(product1.date).getTime() - new Date(product2.date).getTime());
+      };
+
+      break;
+    case 'menor-preco':
+      orderingCallback = (product1: Product, product2: Product) => {
+        return product1.price - product2.price;
+      };
+
+      break;
+    case 'maior-preco':
+      orderingCallback = (product1: Product, product2: Product) => {
+        return -(product1.price - product2.price);
+      };
+
+      break;
+  }
+
+  return orderingCallback;
 }
 
 function handleFilterButtons(container?: Element) {
@@ -159,9 +195,11 @@ function hasSelectedFilter(
 }
 
 async function handleFilter(perPage: number) {
+  const orderingType = (document.querySelector('#product-ordering-desktop') as HTMLSelectElement).value;
+  const orderingCallback = getOrderingCallback(orderingType);
   const { selectedColors, selectedSizes, selectedPriceIntervals } = getDesktopFilters();
   document.querySelector('#products-list ul').innerHTML = '';
-  await renderProducts(1, perPage, selectedColors, selectedSizes, selectedPriceIntervals);
+  await renderProducts(1, perPage, selectedColors, selectedSizes, selectedPriceIntervals, orderingCallback);
 }
 
 async function handleMobileFilter(perPage: number) {
@@ -367,6 +405,15 @@ async function main() {
     handleClearMobileFilters();
     document.querySelector('#products-list ul').innerHTML = '';
     await renderProducts(page, perPage);
+  });
+
+  document.querySelector('#product-ordering-desktop').addEventListener('change', async (e) => {
+    page = 1;
+    const orderingType = (e.target as HTMLSelectElement).value;
+    const orderingCallback = getOrderingCallback(orderingType);
+    const { selectedColors, selectedSizes, selectedPriceIntervals } = getDesktopFilters();
+    document.querySelector('#products-list ul').innerHTML = '';
+    await renderProducts(page, perPage, selectedColors, selectedSizes, selectedPriceIntervals, orderingCallback);
   });
 }
 
