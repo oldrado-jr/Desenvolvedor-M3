@@ -240,7 +240,7 @@ function initializeMobileFilters() {
 
   hideFiltersOnInit();
 
-  document.querySelectorAll('#filter-mobile .filter-text').forEach((element) => {
+  document.querySelectorAll('#filter-mobile span.filter-text').forEach((element) => {
     element.addEventListener('click', () => {
       handleToggleFilter(element);
     });
